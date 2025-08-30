@@ -30,10 +30,10 @@
         #playlist::-webkit-scrollbar-thumb:hover { background: #4ade80; }
 
         /* 반응형 글자 크기를 위한 사용자 정의 클래스 */
-        .font-header { font-size: clamp(1.75rem, 7vw, 2.5rem); }
-        .font-search { font-size: clamp(1rem, 4vw, 1.25rem); }
-        .font-current-song { font-size: clamp(1.25rem, 5vw, 1.875rem); }
-        .font-playlist { font-size: clamp(1.125rem, 4.5vw, 1.5rem); }
+        .font-header { font-size: clamp(1.5rem, 6vw, 2.25rem); }
+        .font-search { font-size: clamp(0.9rem, 3.5vw, 1.125rem); }
+        .font-current-song { font-size: clamp(1.125rem, 5vw, 1.875rem); }
+        .font-playlist { font-size: clamp(1rem, 4vw, 1.25rem); }
 
         /* 배경 그라데이션 애니메이션 */
         @keyframes gradient-animation {
@@ -42,20 +42,20 @@
             100% { background-position: 0% 50%; }
         }
         .animated-gradient {
-            background: linear-gradient(-45deg, #10b981, #34d399, #6ee7b7, #a7f3d0);
+            background: linear-gradient(-45deg, #f0fdf4, #dcfce7, #bbf7d0, #a7f3d0);
             background-size: 400% 400%;
-            animation: gradient-animation 15s ease infinite;
+            animation: gradient-animation 20s ease infinite;
         }
     </style>
 </head>
 <body class="animated-gradient">
     <!-- 스마트폰 화면 높이 문제 해결 및 데스크톱 크기 확대 -->
     <div class="w-full min-h-screen flex flex-col lg:items-center lg:justify-center">
-        <div class="w-full h-full flex flex-col bg-white/80 backdrop-blur-lg lg:max-w-2xl lg:h-[95vh] lg:my-8 lg:rounded-2xl lg:shadow-2xl">
+        <div class="w-full h-full flex flex-col bg-white/90 backdrop-blur-lg lg:max-w-xl lg:h-[95vh] lg:my-8 lg:rounded-2xl lg:shadow-2xl">
             <!-- 헤더 부분: 크기 고정 -->
-            <header class="text-green-900 p-6 flex items-center justify-center space-x-4 flex-shrink-0">
-                <img src="header-image1.jpg" alt="Header Image" class="w-16 h-16 rounded-full border-2 border-green-300">
-                <h1 class="font-header font-bold"> 우리집 찬송가</h1>
+            <header class="text-green-900 p-5 flex items-center justify-center space-x-4 flex-shrink-0">
+                <img src="header-image1.jpg" alt="Header Image" class="w-14 h-14 rounded-full border-2 border-green-300">
+                <h1 class="font-header font-bold">우리집 찬송가</h1>
             </header>
             
             <!-- 검색 및 플레이어 부분: 크기 고정 -->
@@ -64,7 +64,7 @@
                 <div class="flex items-center space-x-2 mb-6">
                     <div class="relative flex-grow">
                         <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">search</span>
-                        <input type="text" id="search-input" placeholder="검색 또는 연속 재생 (예: 1,99)" class="font-search w-full p-4 pl-14 bg-white/50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                        <input type="text" id="search-input" placeholder="검색 또는 연속 재생 (예: 1,99)" class="font-search w-full p-4 pl-12 bg-white/50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition">
                     </div>
                     <button id="continuous-play-btn" title="입력된 범위 연속 재생" class="p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md">
                         <span class="material-icons">playlist_play</span>
@@ -72,7 +72,7 @@
                 </div>
                 
                 <div class="bg-gray-100 rounded-lg p-4 text-center mb-6">
-                    <p class="text-gray-500 text-base">현재 재생 중</p>
+                    <p class="text-gray-500 text-sm">현재 재생 중</p>
                     <h2 id="current-song-title" class="font-current-song font-bold text-gray-900 truncate">선택된 곡 없음</h2>
                 </div>
                 <!-- 오디오 플레이어 크기 확대 -->
