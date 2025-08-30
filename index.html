@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>영미의 찬송가</title>
+    <title>우리집 찬송가</title>
     
     <!-- 홈 화면 아이콘과 전체 화면 설정을 위한 코드 -->
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" href="icon.png">
+    <link rel="apple-touch-icon" href="icon1.png">
+    <link rel="icon" href="icon1.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     
-    <link href="https://fonts.googleapis.comcom/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -19,15 +19,15 @@
             font-size: clamp(14px, 4vw, 18px);
         }
         .playing { 
-            background-color: C; /* Light Purple */
-            color: #065f46; /* Dark Green Purple */
+            background-color: #dcfce7; /* Light Green */
+            color: #14532d; /* Dark Green */
             font-weight: bold;
         }
         /* 스크롤바 디자인 */
         #playlist::-webkit-scrollbar { width: 8px; }
         #playlist::-webkit-scrollbar-track { background: #f1f1f1; }
-        #playlist::-webkit-scrollbar-thumb { background: #d8b4fe; border-radius: 4px; }
-        #playlist::-webkit-scrollbar-thumb:hover { background: #c084fc; }
+        #playlist::-webkit-scrollbar-thumb { background: #86efac; border-radius: 4px; }
+        #playlist::-webkit-scrollbar-thumb:hover { background: #4ade80; }
 
         /* 반응형 글자 크기를 위한 사용자 정의 클래스 */
         .font-header { font-size: clamp(1.75rem, 7vw, 2.5rem); }
@@ -42,7 +42,7 @@
             100% { background-position: 0% 50%; }
         }
         .animated-gradient {
-            background: linear-gradient(-45deg, #a855f7, #ec4899, #f97316, #eab308);
+            background: linear-gradient(-45deg, #10b981, #34d399, #6ee7b7, #a7f3d0);
             background-size: 400% 400%;
             animation: gradient-animation 15s ease infinite;
         }
@@ -54,16 +54,21 @@
         <div class="w-full h-full flex flex-col bg-white/80 backdrop-blur-lg lg:max-w-2xl lg:h-[95vh] lg:my-8 lg:rounded-2xl lg:shadow-2xl">
             <!-- 헤더 부분: 크기 고정 -->
             <header class="text-green-900 p-6 flex items-center justify-center space-x-4 flex-shrink-0">
-                <img src="header-image1.jpg" alt="Header Image" class="w-16 h-16 rounded-full border-2 border-purple-300">
-                <h1 class="font-header font-bold">영미의 찬송가</h1>
+                <img src="header-image1.jpg" alt="Header Image" class="w-16 h-16 rounded-full border-2 border-green-300">
+                <h1 class="font-header font-bold"> 우리집 찬송가</h1>
             </header>
             
             <!-- 검색 및 플레이어 부분: 크기 고정 -->
             <div class="p-6 flex-shrink-0">
-                <!-- 검색창 크기 확대 -->
-                <div class="relative mb-6">
-                    <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">search</span>
-                    <input type="text" id="search-input" placeholder="찬송가 검색 (번호 또는 제목)" class="font-search w-full p-4 pl-14 bg-white/50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition">
+                <!-- 검색창 및 연속재생 버튼 -->
+                <div class="flex items-center space-x-2 mb-6">
+                    <div class="relative flex-grow">
+                        <span class="material-icons absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-2xl">search</span>
+                        <input type="text" id="search-input" placeholder="검색 또는 연속 재생 (예: 1,99)" class="font-search w-full p-4 pl-14 bg-white/50 text-gray-800 placeholder-gray-500 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 transition">
+                    </div>
+                    <button id="continuous-play-btn" title="입력된 범위 연속 재생" class="p-4 bg-green-500 text-white rounded-lg hover:bg-green-600 transition shadow-md">
+                        <span class="material-icons">playlist_play</span>
+                    </button>
                 </div>
                 
                 <div class="bg-gray-100 rounded-lg p-4 text-center mb-6">
@@ -259,7 +264,7 @@
         ];
 
         const songs = [];
-        const baseUrl = "https://raw.githubusercontent.com/ktbghb/ym-hymn-app/main/";
+        const baseUrl = "https://raw.githubusercontent.com/ktbghb/ym1-hymn-app/main/";
 
         // 1장부터 645장까지 자동으로 목록을 만듭니다.
         for (let i = 1; i <= 645; i++) {
@@ -278,23 +283,30 @@
         const sheetMusicImage = document.getElementById('sheet-music-image');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const sheetMusicError = document.getElementById('sheet-music-error');
+        const searchInput = document.getElementById('search-input');
+        const continuousPlayBtn = document.getElementById('continuous-play-btn');
 
         let currentPlayingItem = null;
+        let continuousPlayQueue = [];
+        let currentQueueIndex = -1;
 
-        // 노래 재생이 끝나면 초기화하는 기능 수정
+        // --- Event Listeners ---
+        
+        // 노래 재생이 끝나면
         audioPlayer.addEventListener('ended', () => {
-            currentSongTitleElement.textContent = "선택된 곡 없음";
-            if (currentPlayingItem) {
-                currentPlayingItem.classList.remove('playing');
-                currentPlayingItem.querySelector('i').textContent = 'play_circle_outline';
-                currentPlayingItem = null;
+            if (currentQueueIndex !== -1 && currentQueueIndex < continuousPlayQueue.length - 1) {
+                // 연속 재생 중이면 다음 곡 재생
+                currentQueueIndex++;
+                playSongFromQueue();
+            } else {
+                // 연속 재생이 아니거나 마지막 곡이면 초기화
+                resetPlayer();
             }
-            // 악보 모달도 닫기
-            sheetMusicModal.classList.add('hidden');
         });
 
+        // 오디오 재생 실패 시
         audioPlayer.addEventListener('error', () => {
-            console.error(`오류: '${currentSongTitleElement.textContent}' 파일을 불러올 수 없습니다. GitHub에 파일이 있는지, 이름이 올른지 확인해주세요.`);
+            console.error(`오류: '${currentSongTitleElement.textContent}' 파일을 불러올 수 없습니다.`);
             currentSongTitleElement.textContent = "파일 재생 실패!";
             if (currentPlayingItem) {
                 currentPlayingItem.classList.add('bg-red-100', 'text-red-700');
@@ -302,82 +314,134 @@
             }
         });
 
+        // 모달 닫기 버튼
+        closeModalBtn.addEventListener('click', () => {
+            sheetMusicModal.classList.add('hidden');
+        });
+        
+        // 검색창 입력 시
+        searchInput.addEventListener('input', (event) => {
+            const searchTerm = event.target.value.trim().toLowerCase();
+            
+            if (!searchTerm) {
+                renderPlaylist(songs);
+                return;
+            }
+            // 연속 재생 형식이 아니면 검색 실행
+            if (!searchTerm.includes(',')) {
+                const filteredSongs = songs.filter(song => {
+                    const title = song.title.toLowerCase();
+                    const numberPart = song.title.split('장')[0];
+                    return title.includes(searchTerm) || numberPart.startsWith(searchTerm);
+                });
+                renderPlaylist(filteredSongs);
+            }
+        });
+
+        // 연속 재생 버튼 클릭 시
+        continuousPlayBtn.addEventListener('click', () => {
+            const inputText = searchInput.value.trim();
+            const parts = inputText.split(',');
+
+            if (parts.length === 2) {
+                const start = parseInt(parts[0], 10);
+                const end = parseInt(parts[1], 10);
+
+                if (!isNaN(start) && !isNaN(end) && start > 0 && end <= songs.length && start <= end) {
+                    // 유효한 범위가 입력되면 연속 재생 큐를 만들고 첫 곡 재생
+                    continuousPlayQueue = songs.slice(start - 1, end);
+                    currentQueueIndex = 0;
+                    searchInput.value = ''; // 검색창 비우기
+                    renderPlaylist(songs);  // 전체 목록 다시 표시
+                    playSongFromQueue();
+                } else {
+                    alert("잘못된 범위입니다. '1,99'와 같이 입력해주세요.");
+                }
+            } else {
+                 alert("연속 재생을 하려면 '시작번호,끝번호' 형식으로 입력해주세요. (예: 1,99)");
+            }
+        });
+
+
+        // --- Functions ---
+
+        // 전체 플레이어 상태 초기화
+        function resetPlayer() {
+            currentSongTitleElement.textContent = "선택된 곡 없음";
+            if (currentPlayingItem) {
+                currentPlayingItem.classList.remove('playing');
+                currentPlayingItem.querySelector('i').textContent = 'play_circle_outline';
+            }
+            currentPlayingItem = null;
+            continuousPlayQueue = [];
+            currentQueueIndex = -1;
+            sheetMusicModal.classList.add('hidden');
+        }
+
+        // 재생 목록을 화면에 그리는 함수
         function renderPlaylist(songList) {
             playlistElement.innerHTML = '';
             songList.forEach(song => {
                 const originalIndex = songs.indexOf(song);
                 const songItem = document.createElement('div');
                 songItem.className = 'font-playlist p-3 font-bold rounded-lg cursor-pointer hover:bg-green-100 transition-all flex items-center justify-between';
+                songItem.setAttribute('data-index', originalIndex);
                 songItem.innerHTML = `<span>${song.title}</span><i class="material-icons text-gray-400">play_circle_outline</i>`;
-                songItem.addEventListener('click', () => playSong(originalIndex, songItem));
+                songItem.addEventListener('click', () => {
+                    // 목록에서 직접 클릭하면 연속 재생은 중단
+                    continuousPlayQueue = [];
+                    currentQueueIndex = -1;
+                    playSongByIndex(originalIndex);
+                });
                 playlistElement.appendChild(songItem);
             });
         }
+        
+        // 연속 재생 큐에서 노래를 재생하는 함수
+        function playSongFromQueue() {
+            if (currentQueueIndex >= 0 && currentQueueIndex < continuousPlayQueue.length) {
+                const song = continuousPlayQueue[currentQueueIndex];
+                const originalIndex = songs.indexOf(song);
+                playSongByIndex(originalIndex);
+            }
+        }
 
-        function playSong(index, songItem) {
+        // 인덱스로 특정 노래를 재생하는 핵심 함수
+        function playSongByIndex(index) {
             const song = songs[index];
             currentSongTitleElement.textContent = song.title; 
             
-            // 악보 이미지 상태 초기화 및 로드 이벤트 핸들러 설정
+            // 악보 이미지 로드
             sheetMusicImage.style.display = 'block';
             sheetMusicError.classList.add('hidden');
-
-            sheetMusicImage.onload = () => {
-                sheetMusicImage.style.display = 'block';
-                sheetMusicError.classList.add('hidden');
-            };
+            sheetMusicImage.onload = () => { sheetMusicError.classList.add('hidden'); };
             sheetMusicImage.onerror = () => {
-                sheetMusicImage.style.display = 'none';
-                sheetMusicError.classList.remove('hidden');
+                const fallbackSrc = song.sheetUrl.replace('.JPG', '.jpg');
+                if (sheetMusicImage.src !== fallbackSrc) {
+                    sheetMusicImage.src = fallbackSrc;
+                } else {
+                    sheetMusicImage.style.display = 'none';
+                    sheetMusicError.classList.remove('hidden');
+                }
             };
-
-            // 악보 이미지 설정 및 모달 표시
             sheetMusicImage.src = song.sheetUrl;
             sheetMusicModal.classList.remove('hidden');
 
-            if (audioPlayer.src !== song.url) {
-                audioPlayer.src = song.url;
+            // 오디오 재생
+            audioPlayer.src = song.url;
+            audioPlayer.play().catch(e => console.error("재생 오류:", e));
+
+            // 재생 중인 곡 하이라이트 처리
+            if (currentPlayingItem) {
+                currentPlayingItem.classList.remove('playing');
+                currentPlayingItem.querySelector('i').textContent = 'play_circle_outline';
             }
-            audioPlayer.play().then(() => {
-                if (currentPlayingItem) {
-                    currentPlayingItem.classList.remove('playing', 'bg-red-100', 'text-red-700');
-                    currentPlayingItem.querySelector('i').textContent = 'play_circle_outline';
-                }
-                songItem.classList.add('playing');
-                songItem.querySelector('i').textContent = 'pause_circle_outline';
-                currentPlayingItem = songItem;
-            }).catch(e => console.error("재생 오류:", e));
+            currentPlayingItem = playlistElement.querySelector(`[data-index='${index}']`);
+            if (currentPlayingItem) {
+                currentPlayingItem.classList.add('playing');
+                currentPlayingItem.querySelector('i').textContent = 'pause_circle_outline';
+            }
         }
-
-        // 모달 닫기 버튼 이벤트
-        closeModalBtn.addEventListener('click', () => {
-            sheetMusicModal.classList.add('hidden');
-        });
-
-        // 검색 기능 추가
-        const searchInput = document.getElementById('search-input');
-        searchInput.addEventListener('input', (event) => {
-            const searchTerm = event.target.value.trim();
-            
-            if (!searchTerm) {
-                renderPlaylist(songs); 
-                return;
-            }
-
-            const filteredSongs = songs.filter(song => {
-                const title = song.title.toLowerCase();
-                const term = searchTerm.toLowerCase();
-                
-                const titleMatch = title.includes(term);
-                const numberPart = song.title.split('장')[0];
-                const numberMatch = numberPart.startsWith(term);
-
-                return titleMatch || numberMatch;
-            });
-
-            renderPlaylist(filteredSongs);
-        });
-
 
         // 페이지가 로드되면 전체 목록을 보여줍니다.
         renderPlaylist(songs);
